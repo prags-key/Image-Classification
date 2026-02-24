@@ -18,7 +18,7 @@ The CNN consists of multiple convolutional layers with activation functions, fol
 
 ## Neural Network Model
 
-<img width="1037" height="406" alt="image" src="https://github.com/user-attachments/assets/859a0f24-16ad-43d6-ad53-b6ed819ceb81" />
+![alt text](image.png)
 
 
 ## DESIGN STEPS
@@ -62,33 +62,29 @@ Make predictions on new images and analyze the results.
 ### REGISTER NUMBER: 212224230200
 
 ```
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
 class CNNClassifier(nn.Module):
     def __init__(self):
         super(CNNClassifier, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels=1,out_channels=32,kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(in_channels=32,out_channels=64,kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(in_channels=64,out_channels=128,kernel_size=3,padding=1)
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.fc1=nn.Linear(128*3*3,128)
+        self.fc2=nn.Linear(128,64)
+        self.fc3=nn.Linear(64,10)
 
-        self.conv1 = nn.Conv2d(1, 16, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, padding=1)
-        self.pool = nn.MaxPool2d(2, 2)
 
-        self.fc1 = nn.Linear(32 * 7 * 7, 128)
-        self.fc2 = nn.Linear(128, 10)
 
-        self.relu = nn.ReLU()
 
     def forward(self, x):
-        x = self.pool(self.relu(self.conv1(x)))   # 28x28 → 14x14
-        x = self.pool(self.relu(self.conv2(x)))   # 14x14 → 7x7
-
-        x = x.view(x.size(0), -1)                  # Flatten
-        x = self.relu(self.fc1(x))
-        x = self.fc2(x)
-
+        x=self.pool(torch.relu(self.conv1(x)))
+        x=self.pool(torch.relu(self.conv2(x)))
+        x=self.pool(torch.relu(self.conv3(x)))
+        x=x.view(x.size(0),-1)
+        x=torch.relu(self.fc1(x))
+        x=torch.relu(self.fc2(x))
+        x=self.fc3(x)
         return x
-
 
 
 
@@ -97,65 +93,59 @@ class CNNClassifier(nn.Module):
 
 ```
 # Initialize model, loss function, and optimizer
-model = CNNClassifier()
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-```
-
-```
-from torch.utils.data import DataLoader, TensorDataset
-
-# Dummy data (just to test output)
-images = torch.randn(64, 1, 28, 28)   # 64 fake images
-labels = torch.randint(0, 10, (64,)) # 64 fake labels
-
-train_dataset = TensorDataset(images, labels)
-train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
+model =CNNClassifier()
+criterion =nn.CrossEntropyLoss()
+optimizer =optim.Adam(model.parameters(), lr=0.001)
 
 
 ```
 
 ```
+## Step 3: Train the Model
 def train_model(model, train_loader, num_epochs=3):
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
-
         for images, labels in train_loader:
-            optimizer.zero_grad()
-            outputs = model(images)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
-            running_loss += loss.item()
+          optimizer.zero_grad()
+          outputs = model(images)
+          loss = criterion(outputs, labels)
+          loss.backward()
+          optimizer.step()
+          running_loss += loss.item()
 
-        print('Name: PRAGATHI KUMAR')
-        print('Register Number: 212224230200')
+
+        print('Name:PRAGATHI KUMAR')
+        print('Register Number:  212224230200    ')
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss/len(train_loader):.4f}')
+
 
 
 ```
 
+
+
 ## OUTPUT
 ### Training Loss per Epoch
 
-<img width="562" height="263" alt="image" src="https://github.com/user-attachments/assets/7aa74ec3-91e1-498d-a522-5b260fe6e905" />
+![alt text](image-1.png)
 
 
 ### Confusion Matrix
 
-<img width="906" height="760" alt="image" src="https://github.com/user-attachments/assets/f60ea125-816a-4441-ae63-c48cca7e6838" />
+![alt text](image-2.png)
 
 
 ### Classification Report
 
-<img width="650" height="414" alt="image" src="https://github.com/user-attachments/assets/779a1b5d-c52c-4268-8c58-4bc74e401ea7" />
+![alt text](image-3.png)
 
 
 
 ### New Sample Data Prediction
-<img width="703" height="603" alt="image" src="https://github.com/user-attachments/assets/134d9645-3f47-4dc2-9a35-bbca5d762b93" />
 
+
+![alt text](image-4.png)
 
 
 ## RESULT
